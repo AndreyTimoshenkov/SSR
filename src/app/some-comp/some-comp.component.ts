@@ -1,4 +1,12 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
+
+import { inject } from '@angular/core';
+import { WINDOW, DOCUMENT } from '../../../script/windowInjectionToken';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+// const _window = inject(WINDOW);
+// const _document = inject(DOCUMENT);
+
+
 
 @Component({
   selector: 'app-some-comp',
@@ -14,19 +22,25 @@ export class SomeCompComponent  implements OnInit, OnDestroy {
     this.createElement();
   }
 
+  private _document = inject(DOCUMENT);
+
+
+
   updateLS(){
     localStorage.setItem('count', (this.numberOfClicks).toString());
   }
 
   createElement() {
-    const div = document.createElement('div');
+    const div = this._document.createElement('div');
     div.textContent = `number of clicks: ${this.numberOfClicks}`
-    document.getElementById('header')?.appendChild(div);
+    this._document.getElementById('header')?.appendChild(div);
   }
 
   // private clickListener: (() => void) | undefined;
 
-  // constructor(private el: ElementRef) {}
+  constructor() {
+    // const _document = inject(DOCUMENT);
+  }
 
   ngOnInit() {
     // this.clickListener = this.onClick.bind(this);

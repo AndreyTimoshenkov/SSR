@@ -1,30 +1,27 @@
 
-import { inject } from '@angular/core';
-import { WINDOW, DOCUMENT } from '../../../script/windowInjectionToken';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-
-// const _window = inject(WINDOW);
-// const _document = inject(DOCUMENT);
-
-
-
+import { DOCUMENT } from "@angular/common";
+import { Component, HostBinding, inject } from '@angular/core';
 @Component({
   selector: 'app-some-comp',
   templateUrl: './some-comp.component.html',
   styleUrls: ['./some-comp.component.less']
 })
-export class SomeCompComponent  implements OnInit, OnDestroy {
+export class SomeCompComponent {
+
+  private _document = inject(DOCUMENT);
+
+  @HostBinding('style.margin') margin = '10px';
+  @HostBinding('style.padding') padding = '50px';
+  @HostBinding('style.border') border = 'solid 1px black';
+  @HostBinding('style.boxShadow') boxShadow = '5px 5px rgba(0, 128, 128, 0.5)';
+
   numberOfClicks = 0;
-  // @HostListener('click')
+
   onClick() {
     this.numberOfClicks++;
     this.updateLS();
     this.createElement();
   }
-
-  private _document = inject(DOCUMENT);
-
-
 
   updateLS(){
     localStorage.setItem('count', (this.numberOfClicks).toString());
@@ -32,23 +29,14 @@ export class SomeCompComponent  implements OnInit, OnDestroy {
 
   createElement() {
     const div = this._document.createElement('div');
-    div.textContent = `number of clicks: ${this.numberOfClicks}`
-    this._document.getElementById('header')?.appendChild(div);
+    div.innerText = 'Number of clicks is ' + (this.numberOfClicks).toString();
+    const header = this._document.getElementById('header');
+    header?.appendChild(div);
   }
-
-  // private clickListener: (() => void) | undefined;
 
   constructor() {
-    // const _document = inject(DOCUMENT);
-  }
+    console.log('this is constructor')
+      this.createElement();
+    }
 
-  ngOnInit() {
-    // this.clickListener = this.onClick.bind(this);
-    // this.el.nativeElement.querySelector('#header').addEventListener('click', this.clickListener);
-  }
-
-
-  ngOnDestroy() {
-    // this.el.nativeElement.querySelector('#header').removeEventListener('click', this.clickListener);
-  }
 }

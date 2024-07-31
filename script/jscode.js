@@ -1,16 +1,14 @@
-import { addInjectionStatement, importDocument, importInject, replaceDocument, hasDocument } from './documentWrapper/documentWrapper';
+import { fullReplaceDocument } from './documentWrapper/documentWrapper';
+import { addWindowToLocalStorage } from './documentWrapper/windowWrapper';
+
 
 export default function transform(file, api) {
   const jscode = api.jscodeshift;
   const root = jscode(file.source);
 
-  if (!isComponentFile(root, jscode)) { return; }
-  if (!hasDocument(root, jscode)) { return; }
 
-  importDocument(root, jscode);
-  importInject(root, jscode);
-  addInjectionStatement(root, jscode);
-  replaceDocument(root);
+  fullReplaceDocument(root, jscode);
+  addWindowToLocalStorage(root, jscode);
 
   return root.toSource(root);
 }
@@ -23,3 +21,4 @@ function isComponentFile(root, j) {
     ))
     .size() > 0;
 }
+

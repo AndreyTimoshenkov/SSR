@@ -1,6 +1,6 @@
 import { ImportDeclaration, VariableDeclarator } from 'jscodeshift';
 
-export function addInjectionStatement(root, j) {
+export function addDocumentInjectionStatement(root, j) {
   root.find(j.ClassDeclaration).forEach(path => {
     const classBody = path.node.body.body;
 
@@ -92,4 +92,13 @@ export function hasDocument(root, jscode) {
     .filter(path =>
       path.value.init.callee.object.name === 'document'
     ).size() > 0;
+}
+
+export function fullReplaceDocument(root, jscode) {
+  if (hasDocument(root, jscode)) {
+    addDocumentInjectionStatement(root, jscode);
+    importDocument(root, jscode);
+    importInject(root, jscode);
+    replaceDocument(root);
+   }
 }

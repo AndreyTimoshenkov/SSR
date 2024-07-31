@@ -10,9 +10,11 @@
     "dev:ssr": "ng run ssr-testing-app:serve-ssr",
     "serve:ssr": "node dist/ssr-testing-app/server/main.js",
     "build:ssr": "ng build && ng run ssr-testing-app:server",
+    "ssr gh": "ng build && ng run ssr-testing-app:server --output-path=docs",
     "prerender": "ng run ssr-testing-app:prerender",
     "script": "node ./script/replaceDocumentWithToken.js",
-    "jscode": "jscodeshift --parser=ts -t script/jscode.js src/app/some-comp/*.ts"
+    "jscode": "jscodeshift --parser=ts -t script/jscode.js src/app/some-comp/*.ts",
+    "build gh": "ng build --output-path=docs --base-href=/ssr-testing-app/"
   },
   "private": true,
   "dependencies": {

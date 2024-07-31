@@ -1,14 +1,16 @@
-import { fullReplaceDocument } from './documentWrapper/documentWrapper';
-import { addWindowToLocalStorage } from './documentWrapper/windowWrapper';
+import { fullReplaceDocument } from './wrappers/documentWrapper';
+import { addWindowToLocalStorage, addWindowInjectionStatement } from './wrappers/localStorageWrapper';
+import { replaceWindowWithPrivate } from './wrappers/windowWrapper'
 
 
 export default function transform(file, api) {
   const jscode = api.jscodeshift;
   const root = jscode(file.source);
 
-
-  fullReplaceDocument(root, jscode);
-  addWindowToLocalStorage(root, jscode);
+  replaceWindowWithPrivate(root, jscode);
+  // fullReplaceDocument(root, jscode);
+  // addWindowToLocalStorage(root, jscode);
+  // addWindowInjectionStatement(root, jscode)
 
   return root.toSource(root);
 }
@@ -21,4 +23,5 @@ function isComponentFile(root, j) {
     ))
     .size() > 0;
 }
+
 

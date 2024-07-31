@@ -1,5 +1,4 @@
 import { WINDOW } from "/home/Timoshenkov.AY/Desktop/mine/ssr-testing-app/script/InjectionTokens";
-import { DOCUMENT } from "@angular/common";
 import { Component, HostBinding, inject } from '@angular/core';
 @Component({
   selector: 'app-some-comp',
@@ -8,7 +7,6 @@ import { Component, HostBinding, inject } from '@angular/core';
 })
 export class SomeCompComponent {
   private _window = inject(WINDOW);
-  private _document = inject(DOCUMENT);
 
   @HostBinding('style.margin') margin = '10px';
   @HostBinding('style.padding') padding = '50px';
@@ -24,13 +22,17 @@ export class SomeCompComponent {
   }
 
   updateLS(){
+    localStorage.setItem('count', (this.numberOfClicks).toString());
+  }
+
+  updateLS2(){
     this._window.localStorage.setItem('count', (this.numberOfClicks).toString());
   }
 
   createElement() {
-    const div = this._document.createElement('div');
+    const div = document.createElement('div');
     div.innerText = 'Number of clicks is ' + (this.numberOfClicks).toString();
-    const header = this._document.getElementById('header');
+    const header = document.getElementById('header');
     header?.appendChild(div);
   }
 

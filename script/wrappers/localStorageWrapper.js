@@ -1,4 +1,5 @@
-import { ImportDeclaration } from 'jscodeshift';
+// import { ImportDeclaration } from 'jscodeshift';
+import { importInject } from './documentWrapper';
 
 export function addWindowInjectionStatement(root, j) {
 
@@ -36,45 +37,16 @@ export function addWindowInjectionStatement(root, j) {
     });
 }
 
-export function importInject(root, jscode) {
-  const coreImports = root.find(ImportDeclaration, { source: { value: '@angular/core' } });
 
-  let [hasInject, addInject] = [false, false];
 
-  if (coreImports.size() > 0) {
-    coreImports.forEach(declaration => {
-      declaration.value.specifiers.forEach(specifier => {
-        if (specifier.local.name === 'inject') {
-          hasInject = true;
-        }
-      });
-    });
-
-    if (!hasInject) {
-      coreImports.forEach(declaration => {
-        declaration.value.specifiers.push(jscode.importSpecifier(jscode.identifier('inject')));
-        addInject = true;
-      });
-    }
-  }
-
-  hasInject
-  ? console.log('inject is already imported')
-  : addInject
-      ? console.log('inject has been added to the imports')
-      : null;
+export function hasLocalStorage(root, jscode) {
+  return root.find(jscode.Identifier, { name: 'localStorage' }).size() > 1;
 }
 
 export function addWindowToLocalStorage(root, jscode) {
-  const localStorageArray = root.find(jscode.Identifier, { name: 'localStorage' });
-
-  if (localStorageArray.size < 1) return;
-
-    localStorageArray.forEach(path => {
+  root.find(jscode.Identifier, { name: 'localStorage' }).forEach(
+    path => {
       if (path.parentPath.parentPath.node.object) { return; }
-
-      importInject(root, jscode);
-      addWindowInjectionStatement(root, jscode);
 
       const newMemberExpression = jscode.memberExpression(
         jscode.memberExpression(jscode.thisExpression(), jscode.identifier('_window')),
@@ -83,4 +55,12 @@ export function addWindowToLocalStorage(root, jscode) {
 
       jscode(path).replaceWith(newMemberExpression)
     })
+}
+
+export function fullReplaceLocalStorage(root, jscode) {
+  if (!hasLocalStorage(root, jscode)) { return; }
+
+  importInject(root, jscode);
+  addWindowInjectionStatement(root, jscode);
+  addWindowToLocalStorage(root, jscode);
 }

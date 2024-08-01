@@ -1,5 +1,4 @@
-import { WINDOW } from "/home/Timoshenkov.AY/Desktop/mine/ssr-testing-app/script/InjectionTokens";
-import { NgModule } from '@angular/core';
+import { NgModule, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SomeCompComponent } from './some-comp.component';
 
@@ -14,6 +13,4 @@ import { SomeCompComponent } from './some-comp.component';
     SomeCompComponent
   ]
 })
-export class SomeCompModule {
-  private _window = inject(WINDOW);
-}
+export class SomeCompModule {}

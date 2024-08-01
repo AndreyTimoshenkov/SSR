@@ -34,54 +34,43 @@ export function importDocument(root, jscode) {
   });
 
   if (hasDocumentImport) {
-    console.log('DOCUMENT is already imported');
+    // console.log('DOCUMENT is already imported');
+    return;
   } else {
       if (commonImports.size() > 0) {
             commonImports.forEach(declaration => {
             declaration.value.specifiers.push(jscode.importSpecifier(jscode.identifier('DOCUMENT')));
             });
-            console.log('DOCUMENT has been added to the existing imports');
+            // console.log('DOCUMENT has been added to the existing imports');
       } else {
           const newImport = jscode.importDeclaration(
           [jscode.importSpecifier(jscode.identifier('DOCUMENT'))],
           jscode.literal('@angular/common')
           );
           root.get().node.program.body.unshift(newImport);
-          console.log('DOCUMENT import has been added to the imports as a new line');
+          // console.log('DOCUMENT import has been added to the imports as a new line');
       }
   }
 }
 
+export function hasInject(root, jscode) {
+  return root.find(jscode.Identifier, { name: 'inject' }).size() > 1;
+}
+
 export function importInject(root, jscode) {
+
+  if (hasInject(root, jscode)) { return; }
+
   const coreImports = root.find(ImportDeclaration, { source: { value: '@angular/core' } });
 
-  let [hasInject, addInject] = [false, false];
-
   if (coreImports.size() > 0) {
-    coreImports.forEach(declaration => {
-      declaration.value.specifiers.forEach(specifier => {
-        if (specifier.local.name === 'inject') {
-          hasInject = true;
-        }
-      });
-    });
-
-    if (!hasInject) {
       coreImports.forEach(declaration => {
         declaration.value.specifiers.push(jscode.importSpecifier(jscode.identifier('inject')));
-        addInject = true;
       });
     }
   }
 
-  hasInject
-  ? console.log('inject is already imported')
-  : addInject
-      ? console.log('inject has been added to the imports')
-      : null;
-}
-
-export function replaceDocument(root) {
+export function replaceDocumentWithPrivate(root) {
   root.find(VariableDeclarator)
     .filter(path => path.value.init.callee.object.name = 'document')
     .forEach(path => path.value.init.callee.object.name = 'this._document');
@@ -95,10 +84,10 @@ export function hasDocument(root, jscode) {
 }
 
 export function fullReplaceDocument(root, jscode) {
-  if (hasDocument(root, jscode)) {
-    addDocumentInjectionStatement(root, jscode);
-    importDocument(root, jscode);
-    importInject(root, jscode);
-    replaceDocument(root);
-   }
+  if (!hasDocument(root, jscode)) { return; }
+
+  importInject(root, jscode);
+  importDocument(root, jscode);
+  addDocumentInjectionStatement(root, jscode);
+  replaceDocumentWithPrivate(root);
 }
